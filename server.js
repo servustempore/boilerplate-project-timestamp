@@ -34,9 +34,11 @@ app.get("/api/timestamp/:date_string?", function (req, res) {
     res.json({unix: dateNow.getTime(), utc: dateNow.toUTCString()});
   } 
   else {
-    const requestedDateInMilliseconds = Date.parse(dateString);
-    
-    if (!isNaN(requestedDateInMilliseconds)) {
+    const requestedDate = new Date(dateString);
+
+    // https://stackoverflow.com/a/10589791
+    // checks if the a valid date is created when using the requested date parameter
+    if (requestedDate instanceof Date && !isNaN(requestedDate.valueOf())) {
       const requestedDate = new Date(dateString);
       
       res.json({unix: requestedDate.getTime(), utc: requestedDate.toUTCString()})
