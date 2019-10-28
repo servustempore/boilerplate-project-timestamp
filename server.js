@@ -34,18 +34,28 @@ app.get("/api/timestamp/:date_string?", function (req, res) {
     res.json({unix: dateNow.getTime(), utc: dateNow.toUTCString()});
   } 
   else {
-    const requestedDate = new Date(dateString);
+      let requestedDateObj;
 
-    // https://stackoverflow.com/a/10589791
-    // checks if the a valid date is created when using the requested date parameter
-    if (requestedDate instanceof Date && !isNaN(requestedDate.valueOf())) {
-      const requestedDate = new Date(dateString);
+      if (isNaN(dateString)) {
+        // date string is actually a string timestamp
+        requestedDateObj = new Date(dateString);
+      } else {
+        // date string is actually a number timestamp
+        requestedDateObj = new Date(parseInt(dateString));
+      }
       
-      res.json({unix: requestedDate.getTime(), utc: requestedDate.toUTCString()})
-    }
-    else {
-      res.json({"error" : "Invalid Date" });
-    }
+      // An odd way to check if the instantiated date object generates valid time data (js Date object is very bad, better use moment js)
+      if (!isNaN(requestedDateObj.getTime())) {
+        const response = {
+          unix: requestedDateObj.getTime(),
+          utc: requestedDateObj.toUTCString()
+        };
+  
+        res.json(response);
+      }
+      else {
+        res.json({"error" : "Invalid Date" });
+      }
   }
 });
 
